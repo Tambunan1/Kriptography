@@ -1,0 +1,91 @@
+import tkinter as tk
+from tkinter import messagebox
+
+# Fungsi untuk enkripsi substitusi cipher
+def substitusi_cipher(plaintext, aturan):
+    ciphertext = ""
+    for char in plaintext.upper():
+        if char in aturan:
+            ciphertext += aturan[char]
+        else:
+            ciphertext += char
+    return ciphertext
+
+# Fungsi untuk memproses input dan menampilkan hasil
+def proses_enkripsi():
+    plaintext = entry_plaintext.get().upper()
+    aturan_input = entry_aturan.get().upper()
+    
+    if not plaintext or not aturan_input:
+        messagebox.showwarning("Peringatan", "Isi plaintext dan aturan substitusi terlebih dahulu!")
+        return
+
+    # Proses aturan substitusi
+    aturan_substitusi = {}
+    for pasangan in aturan_input.split(","):
+        if ":" in pasangan:
+            k, v = pasangan.split(":")
+            aturan_substitusi[k.strip()] = v.strip()
+
+    # Proses enkripsi
+    ciphertext = substitusi_cipher(plaintext, aturan_substitusi)
+    
+    # Tampilkan hasil
+    entry_ciphertext.config(state="normal")
+    entry_ciphertext.delete(0, tk.END)
+    entry_ciphertext.insert(0, ciphertext)
+    entry_ciphertext.config(state="readonly")
+
+# Fungsi untuk keluar dari program
+def keluar():
+    window.destroy()
+
+# === Membuat Jendela Utama ===
+window = tk.Tk()
+window.title(" Substitusi Cipher - Tema Lilac")
+window.geometry("500x350")
+window.configure(bg="#E6E6FA")  # Warna lilac lembut
+
+# === Judul ===
+label_judul = tk.Label(window, text=" Program Substitusi Cipher", 
+                       bg="#E6E6FA", fg="#4B0082", 
+                       font=("Arial Rounded MT Bold", 16))
+label_judul.pack(pady=10)
+
+# === Label dan Input Plaintext ===
+frame_input = tk.Frame(window, bg="#E6E6FA")
+frame_input.pack(pady=5)
+
+tk.Label(frame_input, text="Plaintext:", bg="#E6E6FA", fg="#4B0082", font=("Arial", 12)).grid(row=0, column=0, sticky="e", padx=5, pady=5)
+entry_plaintext = tk.Entry(frame_input, width=40, font=("Arial", 12))
+entry_plaintext.grid(row=0, column=1, padx=5, pady=5)
+
+# === Label dan Input Aturan ===
+tk.Label(frame_input, text="Aturan Substitusi:", bg="#E6E6FA", fg="#4B0082", font=("Arial", 12)).grid(row=1, column=0, sticky="e", padx=5, pady=5)
+entry_aturan = tk.Entry(frame_input, width=40, font=("Arial", 12))
+entry_aturan.grid(row=1, column=1, padx=5, pady=5)
+
+# === Contoh aturan ===
+label_contoh = tk.Label(window, text="Contoh aturan: A:K,B:N,C:I,D:L,E:M", 
+                        bg="#E6E6FA", fg="#9370DB", font=("Arial", 10, "italic"))
+label_contoh.pack()
+
+# === Tombol Enkripsi dan Keluar ===
+frame_tombol = tk.Frame(window, bg="#E6E6FA")
+frame_tombol.pack(pady=10)
+
+btn_enkripsi = tk.Button(frame_tombol, text=" Enkripsi", bg="#C8A2C8", fg="white", 
+                         font=("Arial", 11, "bold"), width=12, command=proses_enkripsi)
+btn_enkripsi.grid(row=0, column=0, padx=10)
+
+btn_keluar = tk.Button(frame_tombol, text=" Keluar", bg="#D8BFD8", fg="black", 
+                       font=("Arial", 11), width=12, command=keluar)
+btn_keluar.grid(row=0, column=1, padx=10)
+
+# === Hasil Ciphertext ===
+tk.Label(window, text="Ciphertext:", bg="#E6E6FA", fg="#4B0082", font=("Arial", 12)).pack()
+entry_ciphertext = tk.Entry(window, width=40, font=("Arial", 12), state="readonly", justify="center")
+entry_ciphertext.pack(pady=5)
+
+# === Jalankan Aplikasi ===
+window.mainloop()

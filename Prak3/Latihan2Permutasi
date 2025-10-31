@@ -1,0 +1,171 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import itertools
+import math
+
+# ===============================
+# Aplikasi Permutasi 
+# ===============================
+
+# Warna tema
+BG_LILAC = "#EDE6F2"
+FG_PURPLE = "#4B0082"
+BTN_COLOR = "#D8BFD8"
+ENTRY_BG = "#FAF8FF"
+
+root = tk.Tk()
+root.title(" Aplikasi Permutasi ")
+root.geometry("620x600")
+root.configure(bg=BG_LILAC)
+
+# Judul
+title = tk.Label(root, text=" PROGRAM PERMUTASI ", 
+                 font=("Segoe UI", 18, "bold"), 
+                 bg=BG_LILAC, fg=FG_PURPLE)
+title.pack(pady=15)
+
+# Frame input
+frame_input = tk.Frame(root, bg=BG_LILAC)
+frame_input.pack(pady=5)
+
+# Label dan Entry input array
+label_data = tk.Label(frame_input, text="Masukkan Data (pisahkan dengan koma):", 
+                      font=("Segoe UI", 11), bg=BG_LILAC, fg=FG_PURPLE)
+label_data.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+
+entry_data = tk.Entry(frame_input, font=("Segoe UI", 11), width=40, bg=ENTRY_BG)
+entry_data.grid(row=0, column=1, padx=5, pady=5)
+
+# Label dan Entry untuk k (jumlah elemen diambil)
+label_k = tk.Label(frame_input, text="Nilai k (jika diperlukan):", 
+                   font=("Segoe UI", 11), bg=BG_LILAC, fg=FG_PURPLE)
+label_k.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+
+entry_k = tk.Entry(frame_input, font=("Segoe UI", 11), width=10, bg=ENTRY_BG)
+entry_k.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+
+# Dropdown jenis permutasi
+label_jenis = tk.Label(frame_input, text="Pilih Jenis Permutasi:", 
+                       font=("Segoe UI", 11), bg=BG_LILAC, fg=FG_PURPLE)
+label_jenis.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+
+combo_jenis = ttk.Combobox(frame_input, values=[
+    "Permutasi Menyeluruh",
+    "Permutasi Sebagian",
+    "Permutasi Keliling",
+    "Permutasi Berkelompok",
+    "Latihan: Menata Buku di Rak"
+], font=("Segoe UI", 11), width=35)
+combo_jenis.current(0)
+combo_jenis.grid(row=2, column=1, padx=5, pady=5)
+
+# Hasil
+label_hasil = tk.Label(root, text="Hasil Permutasi:", 
+                       font=("Segoe UI", 12, "bold"), bg=BG_LILAC, fg=FG_PURPLE)
+label_hasil.pack(pady=10)
+
+text_hasil = tk.Text(root, height=12, width=70, bg=ENTRY_BG, fg=FG_PURPLE, 
+                     font=("Consolas", 10), wrap="word")
+text_hasil.pack(pady=5)
+
+# ---------------------------
+# Fungsi logika permutasi
+# ---------------------------
+
+def permutasi_menyeluruh(arr):
+    return list(itertools.permutations(arr))
+
+def permutasi_sebagian(arr, k):
+    return list(itertools.permutations(arr, k))
+
+def permutasi_keliling(arr):
+    if len(arr) <= 1:
+        return [arr]
+    pertama = arr[0]
+    perm_full = list(itertools.permutations(arr[1:]))
+    return [[pertama] + list(p) for p in perm_full]
+
+def permutasi_berkelompok(grup):
+    hasil = [[]]
+    for kelompok in grup:
+        hasil_baru = []
+        for h in hasil:
+            for perm in itertools.permutations(kelompok):
+                hasil_baru.append(h + list(perm))
+        hasil = hasil_baru
+    return hasil
+
+# ---------------------------
+# Fungsi untuk menampilkan hasil
+# ---------------------------
+
+def tampilkan_hasil():
+    text_hasil.delete("1.0", tk.END)
+    jenis = combo_jenis.get()
+    data_input = entry_data.get().strip()
+    k_input = entry_k.get().strip()
+
+    if not data_input:
+        messagebox.showwarning("Peringatan", "Masukkan data terlebih dahulu!")
+        return
+
+    # Jika latihan menata buku
+    if jenis == "Latihan: Menata Buku di Rak":
+        try:
+            n, r = map(int, data_input.split(","))
+            hasil = n ** r
+            text_hasil.insert(tk.END, f"Jumlah cara menata {n} buku di {r} rak = {hasil} cara")
+        except:
+            messagebox.showerror("Error", "Format input salah! Masukkan contoh: 5,3")
+        return
+
+    # Konversi input ke list
+    try:
+        arr = [item.strip() for item in data_input.split(",")]
+    except:
+        messagebox.showerror("Error", "Format input tidak valid!")
+        return
+
+    try:
+        if jenis == "Permutasi Menyeluruh":
+            hasil = permutasi_menyeluruh(arr)
+        elif jenis == "Permutasi Sebagian":
+            if not k_input:
+                messagebox.showwarning("Peringatan", "Masukkan nilai k untuk permutasi sebagian!")
+                return
+            k = int(k_input)
+            hasil = permutasi_sebagian(arr, k)
+        elif jenis == "Permutasi Keliling":
+            hasil = permutasi_keliling(arr)
+        elif jenis == "Permutasi Berkelompok":
+            try:
+                grup = eval(data_input)  # contoh: [[1,2], [3,4]]
+                hasil = permutasi_berkelompok(grup)
+            except:
+                messagebox.showerror("Error", "Gunakan format grup seperti [[1,2],[3,4]]")
+                return
+        else:
+            hasil = []
+
+        # Tampilkan hasil
+        if not hasil:
+            text_hasil.insert(tk.END, "Tidak ada hasil.")
+        else:
+            for i, h in enumerate(hasil, 1):
+                text_hasil.insert(tk.END, f"{i}. {h}\n")
+
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
+
+# Tombol konversi
+btn_hitung = tk.Button(root, text="Tampilkan Hasil", command=tampilkan_hasil,
+                       bg=BTN_COLOR, fg=FG_PURPLE, font=("Segoe UI", 11, "bold"), width=18)
+btn_hitung.pack(pady=10)
+
+# Tombol keluar
+btn_keluar = tk.Button(root, text="Keluar", command=root.destroy,
+                       bg="#C8A2C8", fg="white", font=("Segoe UI", 11, "bold"), width=18)
+btn_keluar.pack(pady=5)
+
+# Jalankan GUI
+root.mainloop()

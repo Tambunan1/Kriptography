@@ -1,0 +1,117 @@
+import tkinter as tk
+from tkinter import messagebox
+import math
+import itertools
+
+# ==============================
+# PROGRAM KOMBINASI
+# ==============================
+
+# Warna tema
+BG_LILAC = "#EDE6F2"
+FG_PURPLE = "#4B0082"
+BTN_COLOR = "#D8BFD8"
+ENTRY_BG = "#FAF8FF"
+
+# Fungsi faktorial
+def faktorial(x):
+    if x == 0 or x == 1:
+        return 1
+    hasil = 1
+    for i in range(2, x + 1):
+        hasil *= i
+    return hasil
+
+# Fungsi kombinasi
+def kombinasi(n, r):
+    if r > n:
+        return 0
+    return faktorial(n) // (faktorial(r) * faktorial(n - r))
+
+# Fungsi menampilkan hasil
+def hitung_kombinasi():
+    text_hasil.delete("1.0", tk.END)
+
+    try:
+        n = int(entry_n.get())
+        r = int(entry_r.get())
+        huruf_input = entry_huruf.get().strip().upper()
+
+        if not huruf_input:
+            messagebox.showwarning("Peringatan", "Masukkan inisial huruf untuk kombinasi!")
+            return
+
+        huruf_list = list(huruf_input)
+        if len(huruf_list) < n:
+            messagebox.showwarning("Peringatan", f"Jumlah huruf harus minimal {n} huruf!")
+            return
+
+        hasil_komb = kombinasi(n, r)
+        text_hasil.insert(tk.END, f"Jumlah kombinasi C({n}, {r}) adalah: {hasil_komb}\n\n")
+
+        # Menampilkan hasil kombinasi huruf
+        text_hasil.insert(tk.END, f"Semua kombinasi huruf {r} dari {n} huruf:\n")
+        kombinasi_huruf = itertools.combinations(huruf_list[:n], r)
+        for i, komb in enumerate(kombinasi_huruf, 1):
+            text_hasil.insert(tk.END, f"{i}. {''.join(komb)}\n")
+
+    except ValueError:
+        messagebox.showerror("Error", "Pastikan nilai n dan r berupa angka!")
+
+# Membuat GUI
+root = tk.Tk()
+root.title(" Program Kombinasi ")
+root.geometry("520x600")
+root.configure(bg=BG_LILAC)
+
+# Judul
+title = tk.Label(root, text=" PROGRAM KOMBINASI ", font=("Segoe UI", 18, "bold"),
+                 bg=BG_LILAC, fg=FG_PURPLE)
+title.pack(pady=15)
+
+# Frame input
+frame_input = tk.Frame(root, bg=BG_LILAC)
+frame_input.pack(pady=10)
+
+# Input n
+label_n = tk.Label(frame_input, text="Jumlah total objek (n):", font=("Segoe UI", 11),
+                   bg=BG_LILAC, fg=FG_PURPLE)
+label_n.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+entry_n = tk.Entry(frame_input, font=("Segoe UI", 11), width=10, bg=ENTRY_BG)
+entry_n.grid(row=0, column=1, padx=5, pady=5)
+
+# Input r
+label_r = tk.Label(frame_input, text="Jumlah objek yang dipilih (r):", font=("Segoe UI", 11),
+                   bg=BG_LILAC, fg=FG_PURPLE)
+label_r.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+entry_r = tk.Entry(frame_input, font=("Segoe UI", 11), width=10, bg=ENTRY_BG)
+entry_r.grid(row=1, column=1, padx=5, pady=5)
+
+# Input huruf
+label_huruf = tk.Label(frame_input, text="Masukkan huruf (contoh: ABCDEF):", font=("Segoe UI", 11),
+                       bg=BG_LILAC, fg=FG_PURPLE)
+label_huruf.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+entry_huruf = tk.Entry(frame_input, font=("Segoe UI", 11), width=20, bg=ENTRY_BG)
+entry_huruf.grid(row=2, column=1, padx=5, pady=5)
+
+# Tombol hitung
+btn_hitung = tk.Button(root, text="Hitung Kombinasi", command=hitung_kombinasi,
+                       bg=BTN_COLOR, fg=FG_PURPLE, font=("Segoe UI", 11, "bold"), width=18)
+btn_hitung.pack(pady=10)
+
+# Hasil output
+label_hasil = tk.Label(root, text="Hasil Kombinasi:", font=("Segoe UI", 12, "bold"),
+                       bg=BG_LILAC, fg=FG_PURPLE)
+label_hasil.pack(pady=10)
+
+text_hasil = tk.Text(root, height=15, width=55, bg=ENTRY_BG, fg=FG_PURPLE,
+                     font=("Consolas", 10), wrap="word")
+text_hasil.pack(pady=5)
+
+# Tombol keluar
+btn_keluar = tk.Button(root, text="Keluar", command=root.destroy,
+                       bg="#C8A2C8", fg="white", font=("Segoe UI", 11, "bold"), width=18)
+btn_keluar.pack(pady=10)
+
+# Jalankan GUI
+root.mainloop()

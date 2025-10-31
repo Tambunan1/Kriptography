@@ -1,0 +1,108 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+
+# ================== Fungsi Cipher ==================
+def substitusi_cipher(plaintext):
+    hasil = ""
+    for char in plaintext:
+        if char.isalpha():
+            ascii_offset = 65 if char.isupper() else 97
+            hasil += chr((ord(char) - ascii_offset + 3) % 26 + ascii_offset)
+        else:
+            hasil += char
+    return hasil
+
+
+def transposisi_cipher(plaintext):
+    panjang_bagian = len(plaintext) // 4 + (1 if len(plaintext) % 4 != 0 else 0)
+    parts = [plaintext[i:i + panjang_bagian] for i in range(0, len(plaintext), panjang_bagian)]
+
+    proses = "\n=== Proses Pembentukan Blok ===\n"
+    for i, part in enumerate(parts):
+        proses += f"Bagian {i + 1}: '{part}'\n"
+
+    proses += "\n=== Proses Transposisi ===\n"
+    ciphertext = ""
+    for col in range(4):
+        for idx, part in enumerate(parts):
+            if col < len(part):
+                proses += f"Menambahkan '{part[col]}' dari Bagian {idx + 1} ke ciphertext.\n"
+                ciphertext += part[col]
+
+    return ciphertext, proses
+
+
+# ================== Fungsi Tombol ==================
+def jalankan_cipher():
+    plaintext = entry_plain.get().upper()
+    if plaintext == "":
+        messagebox.showwarning("Peringatan", "Masukkan plaintext terlebih dahulu!")
+        return
+
+    hasil_subs = substitusi_cipher(plaintext)
+    hasil_trans, log_proses = transposisi_cipher(hasil_subs)
+
+    entry_subs.delete(0, tk.END)
+    entry_subs.insert(0, hasil_subs)
+
+    entry_trans.delete(0, tk.END)
+    entry_trans.insert(0, hasil_trans)
+
+    text_log.delete("1.0", tk.END)
+    text_log.insert(tk.END, log_proses)
+
+
+def hapus_semua():
+    entry_plain.delete(0, tk.END)
+    entry_subs.delete(0, tk.END)
+    entry_trans.delete(0, tk.END)
+    text_log.delete("1.0", tk.END)
+
+
+def keluar():
+    root.destroy()
+
+
+# ================== GUI ==================
+root = tk.Tk()
+root.title("Aplikasi Substitusi + Transposisi Cipher")
+root.geometry("700x550")
+root.config(bg="#efceff")
+
+judul = tk.Label(root, text=" APLIKASI SUBSTITUSI + TRANSPOSISI CIPHER", 
+                 font=("Segoe UI", 14, "bold"), bg="#d9a8ff", fg="#333")
+judul.pack(pady=10)
+
+frame_input = tk.Frame(root, bg="#f1e3f8")
+frame_input.pack(pady=5)
+
+# Input plaintext
+tk.Label(frame_input, text="Plaintext :", bg="#deb9ff").grid(row=0, column=0, sticky="e", padx=5, pady=5)
+entry_plain = ttk.Entry(frame_input, width=60)
+entry_plain.grid(row=0, column=1, pady=5)
+
+# Hasil substitusi
+tk.Label(frame_input, text="Hasil Substitusi :", bg="#d1a0ff").grid(row=1, column=0, sticky="e", padx=5, pady=5)
+entry_subs = ttk.Entry(frame_input, width=60)
+entry_subs.grid(row=1, column=1, pady=5)
+
+# Hasil transposisi
+tk.Label(frame_input, text="Hasil Transposisi :", bg="#c79aff").grid(row=2, column=0, sticky="e", padx=5, pady=5)
+entry_trans = ttk.Entry(frame_input, width=60)
+entry_trans.grid(row=2, column=1, pady=5)
+
+# Tombol
+frame_btn = tk.Frame(root, bg="#e3c4ff")
+frame_btn.pack(pady=10)
+
+ttk.Button(frame_btn, text="Enkripsi", command=jalankan_cipher).grid(row=0, column=0, padx=10)
+ttk.Button(frame_btn, text="Clear", command=hapus_semua).grid(row=0, column=1, padx=10)
+ttk.Button(frame_btn, text="Exit", command=keluar).grid(row=0, column=2, padx=10)
+
+# Log proses
+tk.Label(root, text="Proses Pembentukan Cipher:", font=("Segoe UI", 10, "bold"), bg="#f5f5f5").pack(pady=5)
+text_log = tk.Text(root, height=15, width=80, wrap="word", bg="#f8f8f8", fg="#333")
+text_log.pack(padx=10, pady=5)
+
+root.mainloop()
