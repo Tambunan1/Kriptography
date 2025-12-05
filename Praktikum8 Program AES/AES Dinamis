@@ -1,0 +1,284 @@
+import tkinter as tk
+from tkinter import ttk, scrolledtext
+
+# ================= SBOX (Diubah ke Hexa) =================
+SBOX = [
+    0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
+    0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
+    0xB7, 0xFD, 0x93, 0x26, 0x36, 0x3F, 0xF7, 0xCC, 0x34, 0xA5, 0xE5, 0xF1, 0x71, 0xD8, 0x31, 0x15,
+    0x04, 0xC7, 0x23, 0xC3, 0x18, 0x96, 0x05, 0x9A, 0x07, 0x12, 0x80, 0xE2, 0xEB, 0x27, 0xB2, 0x75,
+    0x09, 0x83, 0x2C, 0x1A, 0x1B, 0x6E, 0x5A, 0xA0, 0x52, 0x3B, 0xD6, 0xB3, 0x29, 0xE3, 0x2F, 0x84,
+    0x53, 0xD1, 0x00, 0xED, 0x20, 0xFC, 0xB1, 0x5B, 0x6A, 0xCB, 0xBE, 0x39, 0x4A, 0x4C, 0x58, 0xCF,
+    0xD0, 0xEF, 0xAA, 0xFB, 0x43, 0x4D, 0x33, 0x85, 0x45, 0xF9, 0x02, 0x7F, 0x50, 0x3C, 0x9F, 0xA8,
+    0x51, 0xA3, 0x40, 0x8F, 0x92, 0x9D, 0x38, 0xF5, 0xBC, 0xB6, 0xDA, 0x21, 0x10, 0xFF, 0xF3, 0xD2,
+    0xCD, 0x0C, 0x13, 0xEC, 0x5F, 0x97, 0x44, 0x17, 0xC4, 0xA7, 0x7E, 0x3D, 0x64, 0x5D, 0x19, 0x73,
+    0x60, 0x81, 0x4F, 0xDC, 0x22, 0x2A, 0x90, 0x88, 0x46, 0xEE, 0xB8, 0x14, 0xDE, 0x5E, 0x0B, 0xDB,
+    0xE0, 0x32, 0x3A, 0x0A, 0x49, 0x06, 0x24, 0x5C, 0xC2, 0xD3, 0xAC, 0x62, 0x91, 0x95, 0xE4, 0x79,
+    0xE7, 0xC8, 0x37, 0x6D, 0x8D, 0xD5, 0x4E, 0xA9, 0x6C, 0x56, 0xF4, 0xEA, 0x65, 0x7A, 0xAE, 0x08,
+    0xBA, 0x78, 0x25, 0x2E, 0x1C, 0xA6, 0xB4, 0xC6, 0xE8, 0xDD, 0x74, 0x1F, 0x4B, 0xBD, 0x8B, 0x8A,
+    0x70, 0x3E, 0xB5, 0x66, 0x48, 0x03, 0xF6, 0x0E, 0x61, 0x35, 0x57, 0xB9, 0x86, 0xC1, 0x1D, 0x9E,
+    0xE1, 0xF8, 0x98, 0x11, 0x69, 0xD9, 0x8E, 0x94, 0x9B, 0x1E, 0x87, 0xE9, 0xCE, 0x55, 0x28, 0xDF,
+    0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
+]
+# =============== INV SBOX (Diubah ke Hexa) ================
+INV_SBOX = [
+    0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
+    0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
+    0x54, 0x7B, 0x94, 0x32, 0xA6, 0xC2, 0x23, 0x3D, 0xEE, 0x4C, 0x95, 0x0B, 0x42, 0xFA, 0xC3, 0x4E,
+    0x08, 0x2E, 0xA1, 0x66, 0x28, 0xD9, 0x24, 0xB2, 0x76, 0x5B, 0xA2, 0x49, 0x6D, 0x8B, 0xD1, 0x25,
+    0x72, 0xF8, 0xF6, 0x64, 0x86, 0x68, 0x98, 0x16, 0xD4, 0xA4, 0x5C, 0xCC, 0x5D, 0x65, 0xB6, 0x92,
+    0x6C, 0x70, 0x48, 0x50, 0xFD, 0xED, 0xB9, 0xDA, 0x5E, 0x15, 0x46, 0x57, 0xA7, 0x8D, 0x9D, 0x84,
+    0x90, 0xD8, 0xAB, 0x00, 0x8C, 0xBC, 0xD3, 0x0A, 0xF7, 0xE4, 0x58, 0x05, 0xB8, 0xB3, 0x45, 0x06,
+    0xD0, 0x2C, 0x1E, 0x8F, 0xCA, 0x3F, 0x0F, 0x02, 0xC1, 0xAF, 0xBD, 0x03, 0x01, 0x13, 0x8A, 0x6B,
+    0x3A, 0x91, 0x11, 0x41, 0x4F, 0x67, 0xDC, 0xEA, 0x97, 0xF2, 0xCF, 0xCE, 0xF0, 0xB4, 0xE6, 0x73,
+    0x96, 0xAC, 0x74, 0x22, 0xE7, 0xAD, 0x35, 0x85, 0xE2, 0xF9, 0x37, 0xE8, 0x1C, 0x75, 0xDF, 0x6E,
+    0x47, 0xF1, 0x1A, 0x71, 0x1D, 0x29, 0xC5, 0x89, 0x6F, 0xB7, 0x62, 0x0E, 0xAA, 0x18, 0xBE, 0x1B,
+    0xFC, 0x56, 0x3E, 0x4B, 0xC6, 0xD2, 0x79, 0x20, 0x9A, 0xDB, 0xC0, 0xFE, 0x78, 0xCD, 0x5A, 0xF4,
+    0x1F, 0xDD, 0xA8, 0x33, 0x88, 0x07, 0xC7, 0x31, 0xB1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xEC, 0x5F,
+    0x60, 0x51, 0x7F, 0xA9, 0x19, 0xB5, 0x4A, 0x0D, 0x2D, 0xE5, 0x7A, 0x9F, 0x93, 0xC9, 0x9C, 0xEF,
+    0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61,
+    0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
+]
+
+# ================= RCON (Diubah ke Hexa) =================
+RCON = [0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36]
+
+def pad_pkcs7(text):
+    data = [ord(c) for c in text]
+    pad_len = 16 - (len(data) % 16)
+    return data + [pad_len] * pad_len
+
+def unpad_pkcs7(data):
+    return data[:-data[-1]]
+
+def bytes_to_matrix(b):
+    return [b[i:i+4] for i in range(0, 16, 4)]
+
+def matrix_to_bytes(m):
+    return [b for r in m for b in r]
+
+def print_matrix(label, m, text_widget):
+    text_widget.insert(tk.END, f"{label}:\n", "lilac")
+    for row in m:
+        text_widget.insert(tk.END, ' '.join(f'{x:02x}' for x in row) + '\n', "lilac")
+    text_widget.insert(tk.END, '\n')
+
+def add_round_key(s, k, text_widget):
+    result = [[a ^ b for a, b in zip(x, y)] for x, y in zip(s, k)]
+    print_matrix("After AddRoundKey", result, text_widget)
+    return result
+
+def sub_bytes(s, text_widget):
+    result = [[SBOX[b] for b in row] for row in s]
+    print_matrix("After SubBytes", result, text_widget)
+    return result
+
+def inv_sub_bytes(s, text_widget):
+    result = [[INV_SBOX[b] for b in row] for row in s]
+    print_matrix("After InvSubBytes", result, text_widget)
+    return result
+
+def shift_rows(s, text_widget):
+    result = [
+        s[0],
+        s[1][1:] + s[1][:1],
+        s[2][2:] + s[2][:2],
+        s[3][3:] + s[3][:3],
+    ]
+    print_matrix("After ShiftRows", result, text_widget)
+    return result
+
+def inv_shift_rows(s, text_widget):
+    result = [
+        s[0],
+        s[1][-1:] + s[1][:-1],
+        s[2][-2:] + s[2][:-2],
+        s[3][-3:] + s[3][:-3],
+    ]
+    print_matrix("After InvShiftRows", result, text_widget)
+    return result
+
+def xtime(a):
+    return ((a << 1) ^ 0x1B) & 0xFF if a & 0x80 else (a << 1)
+
+def mix_single_column(c):
+    a = c
+    b = [xtime(x) for x in a]
+    return [
+        b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1],
+        b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2],
+        b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3],
+        b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0],
+    ]
+
+def mix_columns(s, text_widget):
+    cols = list(zip(*s))
+    mixed = [mix_single_column(list(c)) for c in cols]
+    result = [list(col) for col in zip(*mixed)]
+    print_matrix("After MixColumns", result, text_widget)
+    return result
+
+def mul(a, b):
+    r = 0
+    for _ in range(8):
+        if b & 1: r ^= a
+        h = a & 0x80
+        a = (a << 1) & 0xFF
+        if h: a ^= 0x1B
+        b >>= 1
+    return r
+
+def inv_mix_single_column(c):
+    return [
+        mul(c[0], 14) ^ mul(c[1], 11) ^ mul(c[2], 13) ^ mul(c[3], 9),
+        mul(c[0], 9) ^ mul(c[1], 14) ^ mul(c[2], 11) ^ mul(c[3], 13),
+        mul(c[0], 13) ^ mul(c[1], 9) ^ mul(c[2], 14) ^ mul(c[3], 11),
+        mul(c[0], 11) ^ mul(c[1], 13) ^ mul(c[2], 9) ^ mul(c[3], 14),
+    ]
+
+def inv_mix_columns(s, text_widget):
+    cols = list(zip(*s))
+    mixed = [inv_mix_single_column(list(c)) for c in cols]
+    result = [list(c) for c in zip(*mixed)]
+    print_matrix("After InvMixColumns", result, text_widget)
+    return result
+
+def key_expansion(key, key_len):
+    if key_len == 128:
+        nk = 4
+        nr = 10
+    elif key_len == 192:
+        nk = 6
+        nr = 12
+    elif key_len == 256:
+        nk = 8
+        nr = 14
+    else:
+        raise ValueError("Invalid key length")
+    
+    w = [key[i:i+4] for i in range(0, len(key), 4)]
+    for i in range(nk, 4*(nr+1)):
+        t = w[i-1]
+        if i % nk == 0:
+            t = t[1:] + t[:1]
+            t = [SBOX[x] for x in t]
+            t[0] ^= RCON[(i // nk) - 1]
+        elif nk > 6 and i % nk == 4:
+            t = [SBOX[x] for x in t]
+        w.append([t[j] ^ w[i - nk][j] for j in range(4)])
+    return [w[i:i+4] for i in range(0, 4*(nr+1), 4)], nr
+
+def aes_encrypt_block(b, rk, nr, text_widget):
+    s = bytes_to_matrix(b)
+    text_widget.insert(tk.END, "Initial State:\n", "lilac")
+    print_matrix("State", s, text_widget)
+    s = add_round_key(s, rk[0], text_widget)
+    for r in range(1, nr):
+        text_widget.insert(tk.END, f"\nRound {r}:\n", "lilac")
+        s = sub_bytes(s, text_widget)
+        s = shift_rows(s, text_widget)
+        s = mix_columns(s, text_widget)
+        s = add_round_key(s, rk[r], text_widget)
+    text_widget.insert(tk.END, f"\nFinal Round {nr}:\n", "lilac")
+    s = sub_bytes(s, text_widget)
+    s = shift_rows(s, text_widget)
+    s = add_round_key(s, rk[nr], text_widget)
+    return matrix_to_bytes(s)
+
+def aes_decrypt_block(b, rk, nr, text_widget):
+    s = bytes_to_matrix(b)
+    text_widget.insert(tk.END, "Initial State:\n", "lilac")
+    print_matrix("State", s, text_widget)
+    s = add_round_key(s, rk[nr], text_widget)
+    for r in range(nr-1, 0, -1):
+        text_widget.insert(tk.END, f"\nRound {nr-r}:\n", "lilac")
+        s = inv_shift_rows(s, text_widget)
+        s = inv_sub_bytes(s, text_widget)
+        s = add_round_key(s, rk[r], text_widget)
+        s = inv_mix_columns(s, text_widget)
+    text_widget.insert(tk.END, f"\nFinal Round {nr}:\n", "lilac")
+    s = inv_shift_rows(s, text_widget)
+    s = inv_sub_bytes(s, text_widget)
+    s = add_round_key(s, rk[0], text_widget)
+    return matrix_to_bytes(s)
+
+def aes_encrypt(plaintext, key, key_len, text_widget):
+    pb = pad_pkcs7(plaintext)
+    kb = [ord(c) for c in key]
+    kb = (kb + [0] * (key_len // 8))[:key_len // 8]
+    rk, nr = key_expansion(kb, key_len)
+    cipher = []
+    for i in range(0, len(pb), 16):
+        text_widget.insert(tk.END, f"\nEncrypting block {i//16 + 1}:\n", "lilac")
+        cipher += aes_encrypt_block(pb[i:i+16], rk, nr, text_widget)
+    return cipher
+
+def aes_decrypt(cipher, key, key_len, text_widget):
+    kb = [ord(c) for c in key]
+    kb = (kb + [0] * (key_len // 8))[:key_len // 8]
+    rk, nr = key_expansion(kb, key_len)
+    dec = []
+    for i in range(0, len(cipher), 16):
+        text_widget.insert(tk.END, f"\nDecrypting block {i//16 + 1}:\n", "lilac")
+        dec += aes_decrypt_block(cipher[i:i+16], rk, nr, text_widget)
+    return ''.join(chr(x) for x in unpad_pkcs7(dec))
+
+def encrypt_action():
+    plaintext = plaintext_entry.get()
+    key = key_entry.get()
+    key_len = int(key_len_var.get())
+    output_text.delete(1.0, tk.END)
+    try:
+        cipher = aes_encrypt(plaintext, key, key_len, output_text)
+        output_text.insert(tk.END, f"\nCiphertext (hex): {' '.join(f'{x:02x}' for x in cipher)}\n", "lilac")
+    except Exception as e:
+        output_text.insert(tk.END, f"Error: {str(e)}\n", "lilac")
+
+def decrypt_action():
+    cipher_hex = cipher_entry.get()
+    key = key_entry.get()
+    key_len = int(key_len_var.get())
+    output_text.delete(1.0, tk.END)
+    try:
+        cipher = [int(x, 16) for x in cipher_hex.split()]
+        dec_text = aes_decrypt(cipher, key, key_len, output_text)
+        output_text.insert(tk.END, f"\nDecrypted: {dec_text}\n", "lilac")
+    except Exception as e:
+        output_text.insert(tk.END, f"Error: {str(e)}\n", "lilac")
+
+# GUI Setup
+root = tk.Tk()
+root.title("AES Encryption/Decryption with Lilac Theme")
+root.configure(bg='#E6E6FA')  # Lilac background
+
+# Input fields
+tk.Label(root, text="Plaintext:", bg='#E6E6FA', fg='#8B008B').grid(row=0, column=0, sticky=tk.W)
+plaintext_entry = tk.Entry(root, width=50)
+plaintext_entry.grid(row=0, column=1)
+
+tk.Label(root, text="Key:", bg='#E6E6FA', fg='#8B008B').grid(row=1, column=0, sticky=tk.W)
+key_entry = tk.Entry(root, width=50)
+key_entry.grid(row=1, column=1)
+
+tk.Label(root, text="Key Length:", bg='#E6E6FA', fg='#8B008B').grid(row=2, column=0, sticky=tk.W)
+key_len_var = tk.StringVar(value="128")
+key_len_combo = ttk.Combobox(root, textvariable=key_len_var, values=["128", "192", "256"], state="readonly")
+key_len_combo.grid(row=2, column=1, sticky=tk.W)
+
+tk.Label(root, text="Ciphertext (hex for decrypt):", bg='#E6E6FA', fg='#8B008B').grid(row=3, column=0, sticky=tk.W)
+cipher_entry = tk.Entry(root, width=50)
+cipher_entry.grid(row=3, column=1)
+
+# Buttons
+encrypt_button = tk.Button(root, text="Encrypt", command=encrypt_action, bg='#DDA0DD', fg='#8B008B')
+encrypt_button.grid(row=4, column=0, pady=10)
+
+decrypt_button = tk.Button(root, text="Decrypt", command=decrypt_action, bg='#DDA0DD', fg='#8B008B')
+decrypt_button.grid(row=4, column=1, pady=10)
+
+# Output area
+output_text = scrolledtext.ScrolledText(root, width=80, height=30, bg='#F8F8FF', fg='#8B008B')
+output_text.grid(row=5, column=0, columnspan=2, pady=10)
+output_text.tag_configure("lilac", foreground="#8B008B")
+
+root.mainloop()
